@@ -35,7 +35,6 @@ $app->add(
 
 ```php
 use District5\MinimumVersion\Slim\Slim4Middleware;
-use District5\MinimumVersion\Slim\Slim4Middleware::VERSION_HEADER;
 
 $app->add(
     Slim4Middleware::fromEnv(
