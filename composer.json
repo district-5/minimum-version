@@ -1,0 +1,30 @@
+{
+  "name": "district5/minimum-version",
+  "type": "library",
+  "description": "A minimum version enforcement library, with adapters in place for the Slim Framework 4 and PSR-7 libraries.",
+  "keywords": ["request", "minimum version", "enforcement", "slim", "psr-7"],
+  "homepage": "https://github.com/district-5/minimum-version",
+  "license": "mit",
+  "authors": [
+    {
+      "name": "District5",
+      "email": "hello@district5.co.uk"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "psr/http-message": "*",
+    "psr/log": "*"
+  },
+  "autoload": {
+    "psr-4": { "District5\\MinimumVersion\\": "src/" }
+  },
+  "autoload-dev": {
+    "psr-4": { "District5\\MinimumVersionTests\\": "tests/" }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "slim/slim": "^4",
+    "slim/psr7": "^1"
+  }
+}

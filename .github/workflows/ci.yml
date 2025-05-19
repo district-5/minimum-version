@@ -1,0 +1,44 @@
+name: CI
+on: [push]
+
+jobs:
+  unit-test:
+    name: Unit testing
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: tests-group
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install composer dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: latest
+          php_extensions: "xdebug calendar sockets"
+
+      - name: Run unit tests
+        uses: php-actions/phpunit@v3
+        env:
+          XDEBUG_MODE: coverage
+        with:
+          version: latest
+          php_version: latest
+          php_extensions: "xdebug calendar sockets"
+          args: "-d date.timezone=UTC --coverage-clover ./coverage.xml --log-junit junit.xml"
+          configuration: phpunit.xml
+          testsuite: TestSuite
+          bootstrap: tests/bootstrap.php
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: district-5/minimum-version
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

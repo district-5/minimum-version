@@ -1,0 +1,7 @@
+build/*
+.idea
+vendor
+composer.lock
+coverage.xml
+coverage.xml
+junit.xml
