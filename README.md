@@ -1,7 +1,7 @@
-[![CI](https://github.com/district-5/php-mondoc/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/district-5/php-mondoc/actions)
-[![Latest Stable Version](http://poser.pugx.org/district5/mondoc/v)](https://packagist.org/packages/district5/mondoc)
-[![PHP Version Require](http://poser.pugx.org/district5/mondoc/require/php)](https://packagist.org/packages/district5/mondoc)
-[![Codecov](https://codecov.io/gh/district-5/php-mondoc/branch/master/graph/badge.svg)](https://codecov.io/gh/district-5/php-mondoc)
+[![CI](https://github.com/district-5/minimum-version/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/district-5/minimum-version/actions)
+[![Latest Stable Version](http://poser.pugx.org/district5/minimum-version/v)](https://packagist.org/packages/district5/minimum-version)
+[![PHP Version Require](http://poser.pugx.org/district5/minimum-version/require/php)](https://packagist.org/packages/district5/minimum-version)
+[![Codecov](https://codecov.io/gh/district-5/minimum-version/branch/master/graph/badge.svg)](https://codecov.io/gh/district-5/minimum-version)
 
 # Minimum version enforcement for API services...
 
