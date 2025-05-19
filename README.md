@@ -22,8 +22,6 @@ There are two methods of constructing the middleware:
 ```php
 use District5\MinimumVersion\Slim\Slim4Middleware;
 
-string $minimumVersionEnvKey, string|null $allowedVersionsEnvKey = null, string $headerName = self::VERSION_HEADER
-
 $app->add(
     Slim4Middleware::fromValues(
         '1.0.0', // Minimum version to accept
