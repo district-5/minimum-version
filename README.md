@@ -10,6 +10,11 @@
 See the official [Slim Framework 4](https://www.slimframework.com/docs/v4/objects/routing.html#route-middleware)
 middleware documentation for more information.
 
+When using the Slim Framework 4, you can use the `Slim4Middleware` class to enforce a minimum version for your API.
+
+If a request is made with a version lower than the minimum version, a native Slim HttpException, of code `406` will be
+thrown. A `406` means "Not Acceptable", which is the correct response code for this situation.
+
 There are two methods of constructing the middleware:
 
 #### Option 1, using static values
