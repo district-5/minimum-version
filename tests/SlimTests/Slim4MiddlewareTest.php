@@ -15,6 +15,7 @@ namespace District5\MinimumVersionTests\SlimTests;
 
 use District5\MinimumVersion\Exception\InvalidInitializationException;
 use District5\MinimumVersion\Slim\Exception\HttpNotAcceptableException;
+use District5\MinimumVersion\Slim\Slim4Checker;
 use District5\MinimumVersion\Slim\Slim4Middleware;
 use District5\MinimumVersionTests\SlimTests\TestObjects\RequestHandlerTestObject;
 use Fig\Http\Message\StatusCodeInterface;
@@ -34,7 +35,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(InvalidInitializationException::class);
         $this->expectExceptionMessage('Minimum version x is not valid');
 
-        Slim4Middleware::fromValues('x', [], 'X-Version');
+        Slim4Checker::fromValues('x', [], 'X-Version');
     }
 
     public function testFromStringsEmptyMinimumVersion()
@@ -42,7 +43,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(InvalidInitializationException::class);
         $this->expectExceptionMessage('Minimum version cannot be empty');
 
-        Slim4Middleware::fromValues('', [], 'X-Version');
+        Slim4Checker::fromValues('', [], 'X-Version');
     }
 
     public function testFromStringsEmptySpacedMinimumVersion()
@@ -50,7 +51,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(InvalidInitializationException::class);
         $this->expectExceptionMessage('Minimum version cannot be empty');
 
-        Slim4Middleware::fromValues(' ', [], 'X-Version');
+        Slim4Checker::fromValues(' ', [], 'X-Version');
     }
 
     public function testFromStringsInvalidHeaderName()
@@ -58,7 +59,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(InvalidInitializationException::class);
         $this->expectExceptionMessage('Header name cannot be empty');
 
-        Slim4Middleware::fromValues('1.0.0', [], '');
+        Slim4Checker::fromValues('1.0.0', [], '');
     }
 
     public function testFromEnvInvalidIgnoredMinimumVersion()
@@ -66,7 +67,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(InvalidInitializationException::class);
         $this->expectExceptionMessage('Minimum version some-invalid is not valid');
 
-        Slim4Middleware::fromEnvironment(
+        Slim4Checker::fromEnvironment(
             'MIN_VERSION_INVALID',
             'ALLOWED_VERSIONS',
             'X-Version'
@@ -80,7 +81,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
     public function testFromEnvWithoutAllowedVersionsDoesNotThrow()
     {
         $this->expectNotToPerformAssertions();
-        Slim4Middleware::fromEnvironment(
+        Slim4Checker::fromEnvironment(
             'MIN_VERSION_VALID',
             'ALLOWED_VERSIONS_NO_SUCH_KEY', // key does not exist
             'X-Version'
@@ -92,7 +93,7 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(InvalidInitializationException::class);
         $this->expectExceptionMessageMatches('/Environment variable( THIS_IS_NOT_A_VALID_KEY)? not found/');
 
-        Slim4Middleware::fromEnvironment(
+        Slim4Checker::fromEnvironment(
             'THIS_IS_NOT_A_VALID_KEY',
             'ALLOWED_VERSIONS',
             'X-Version'
@@ -113,12 +114,13 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $minVersion = '1.0.0';
         $allowedVersions = ['1.0.0', '1.0.1'];
 
-        $instance = Slim4Middleware::fromValues(
+        $instance = Slim4Checker::fromValues(
             $minVersion,
             $allowedVersions,
             'X-Missing-Version'
         );
-        $instance->process($request, new RequestHandlerTestObject());
+        $middleware = new Slim4Middleware($instance);
+        $middleware->process($request, new RequestHandlerTestObject());
     }
 
     /**
@@ -135,12 +137,13 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $minVersion = '1.0.0';
         $allowedVersions = ['1.0.0', '1.0.1'];
 
-        $instance = Slim4Middleware::fromValues(
+        $instance = Slim4Checker::fromValues(
             $minVersion,
             $allowedVersions,
             'X-Foo'
         );
-        $instance->process($request, new RequestHandlerTestObject());
+        $middleware = new Slim4Middleware($instance);
+        $middleware->process($request, new RequestHandlerTestObject());
     }
 
     /**
@@ -157,12 +160,13 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $minVersion = '1.0.0';
         $allowedVersions = ['1.0.0', '1.0.1'];
 
-        $instance = Slim4Middleware::fromValues(
+        $instance = Slim4Checker::fromValues(
             $minVersion,
             $allowedVersions,
             'X-Version'
         );
-        $instance->process($request, new RequestHandlerTestObject());
+        $middleware = new Slim4Middleware($instance);
+        $middleware->process($request, new RequestHandlerTestObject());
     }
 
     /**
@@ -176,12 +180,13 @@ class Slim4MiddlewareTest extends SlimTestAbstract
         $this->expectException(HttpNotAcceptableException::class);
         $this->expectExceptionMessageMatches('/0.0.9 is less than the minimum required version/');
 
-        $instance = Slim4Middleware::fromEnvironment(
+        $instance = Slim4Checker::fromEnvironment(
             'MIN_VERSION_VALID',
             'ALLOWED_VERSIONS',
             'X-Version'
         );
-        $instance->process($request, new RequestHandlerTestObject());
+        $middleware = new Slim4Middleware($instance);
+        $middleware->process($request, new RequestHandlerTestObject());
     }
 
     /**
@@ -192,12 +197,13 @@ class Slim4MiddlewareTest extends SlimTestAbstract
     {
         $request = $this->generateRequest('0.0.8');
 
-        $instance = Slim4Middleware::fromValues(
+        $instance = Slim4Checker::fromValues(
             '1.0.0',
             ['0.0.8'], // despite requiring 1.0.0 as minimum, this is explicitly allowed
             'X-Version'
         );
-        $result = $instance->process($request, new RequestHandlerTestObject());
+        $middleware = new Slim4Middleware($instance);
+        $result = $middleware->process($request, new RequestHandlerTestObject());
         $this->assertEquals(StatusCodeInterface::STATUS_ACCEPTED, $result->getStatusCode());
     }
 
@@ -209,12 +215,13 @@ class Slim4MiddlewareTest extends SlimTestAbstract
     {
         $request = $this->generateRequest('1.0.0');
 
-        $instance = Slim4Middleware::fromValues(
+        $instance = Slim4Checker::fromValues(
             '1.0.0',
             [],
             'X-Version'
         );
-        $result = $instance->process($request, new RequestHandlerTestObject());
+        $middleware = new Slim4Middleware($instance);
+        $result = $middleware->process($request, new RequestHandlerTestObject());
         $this->assertEquals(StatusCodeInterface::STATUS_ACCEPTED, $result->getStatusCode());
     }
 

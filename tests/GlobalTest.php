@@ -14,7 +14,7 @@ namespace District5\MinimumVersionTests;
 
 
 use District5\MinimumVersion\Exception\GeneralException;
-use District5\MinimumVersion\Slim\Slim4Middleware;
+use District5\MinimumVersion\Slim\Slim4Checker;
 use District5\MinimumVersionTests\SlimTests\SlimTestAbstract;
 
 /**
@@ -23,6 +23,20 @@ use District5\MinimumVersionTests\SlimTests\SlimTestAbstract;
  */
 class GlobalTest extends SlimTestAbstract
 {
+    public function testGetLastError()
+    {
+        $instance = Slim4Checker::fromValues("0.0.0", ["0.0.0"]);
+        $this->assertNull($instance->getLastError());
+        $instance->check("a.a.a");
+        $this->assertMatchesRegularExpression("/Version a.a.a is not a valid representation of a version/", $instance->getLastError());
+    }
+
+    public function testCheckMinimumVersionVariableAssignment()
+    {
+        $instance = Slim4Checker::fromValues("0.0.0", ["0.0.0"]);
+        $this->assertEquals("0.0.0", $instance->getMinimumVersion());
+    }
+
     public function testValidVersions()
     {
         $validVersions = [
@@ -38,42 +52,42 @@ class GlobalTest extends SlimTestAbstract
             '1.2.3.a',
         ];
         foreach ($validVersions as $version) {
-            $this->assertTrue(Slim4Middleware::isValidVersion($version));
+            $this->assertTrue(Slim4Checker::isValidVersion($version));
         }
     }
 
     public function testInvalidVersionOnePiece()
     {
         $this->expectException(GeneralException::class);
-        Slim4Middleware::isValidVersion('a');
+        Slim4Checker::isValidVersion('a');
     }
 
     public function testValidVersionOnePiece()
     {
-        $this->assertTrue(Slim4Middleware::isValidVersion('1'));
+        $this->assertTrue(Slim4Checker::isValidVersion('1'));
     }
 
     public function testGetComponentsOne()
     {
-        $this->assertArrayHasKey('major', Slim4Middleware::getVersionComponents('1'));
+        $this->assertArrayHasKey('major', Slim4Checker::getVersionComponents('1'));
     }
 
     public function testInvalidVersionTwoPieces()
     {
         $this->expectException(GeneralException::class);
-        Slim4Middleware::isValidVersion('1.a');
+        Slim4Checker::isValidVersion('1.a');
     }
 
     public function testValidVersionTwoPieces()
     {
-        $this->assertTrue(Slim4Middleware::isValidVersion('1.2'));
+        $this->assertTrue(Slim4Checker::isValidVersion('1.2'));
     }
 
     public function testGetComponentsTwo()
     {
         $this->assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(
             ['major' => 1, 'minor' => 2],
-            Slim4Middleware::getVersionComponents('1.2'),
+            Slim4Checker::getVersionComponents('1.2'),
             ['major', 'minor']
         );
     }
@@ -81,19 +95,19 @@ class GlobalTest extends SlimTestAbstract
     public function testInvalidVersionThreePieces()
     {
         $this->expectException(GeneralException::class);
-        Slim4Middleware::isValidVersion('1.2.a');
+        Slim4Checker::isValidVersion('1.2.a');
     }
 
     public function testValidVersionThreePieces()
     {
-        $this->assertTrue(Slim4Middleware::isValidVersion('1.2.3'));
+        $this->assertTrue(Slim4Checker::isValidVersion('1.2.3'));
     }
 
     public function testGetComponentsThree()
     {
         $this->assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(
             ['major' => 1, 'minor' => 2, 'patch' => 3],
-            Slim4Middleware::getVersionComponents('1.2.3'),
+            Slim4Checker::getVersionComponents('1.2.3'),
             ['major', 'minor', 'patch']
         );
     }
@@ -101,19 +115,19 @@ class GlobalTest extends SlimTestAbstract
     public function testInvalidVersionFourPieces()
     {
         $this->expectException(GeneralException::class);
-        Slim4Middleware::isValidVersion('1.2.3.a');
+        Slim4Checker::isValidVersion('1.2.3.a');
     }
 
     public function testValidVersionFourPieces()
     {
-        $this->assertTrue(Slim4Middleware::isValidVersion('1.2.3.4'));
+        $this->assertTrue(Slim4Checker::isValidVersion('1.2.3.4'));
     }
 
     public function testGetComponentsFour()
     {
         $this->assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(
             ['major' => 1, 'minor' => 2, 'patch' => 3, 'build' => 4],
-            Slim4Middleware::getVersionComponents('1.2.3.4'),
+            Slim4Checker::getVersionComponents('1.2.3.4'),
             ['major', 'minor', 'patch', 'build']
         );
     }
@@ -121,19 +135,19 @@ class GlobalTest extends SlimTestAbstract
     public function testInvalidVersionFivePieces()
     {
         $this->expectException(GeneralException::class);
-        Slim4Middleware::isValidVersion('1.2.3.4.a');
+        Slim4Checker::isValidVersion('1.2.3.4.a');
     }
 
     public function testValidVersionFivePieces()
     {
-        $this->assertTrue(Slim4Middleware::isValidVersion('1.2.3.4.5'));
+        $this->assertTrue(Slim4Checker::isValidVersion('1.2.3.4.5'));
     }
 
     public function testGetComponentsFive()
     {
         $this->assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(
             ['major' => 1, 'minor' => 2, 'patch' => 3, 'build' => 4, 'unmapped-0' => 5],
-            Slim4Middleware::getVersionComponents('1.2.3.4.5'),
+            Slim4Checker::getVersionComponents('1.2.3.4.5'),
             ['major', 'minor', 'patch', 'build', 'unmapped-0']
         );
     }
@@ -141,26 +155,26 @@ class GlobalTest extends SlimTestAbstract
     public function testInvalidVersionSixPieces()
     {
         $this->expectException(GeneralException::class);
-        Slim4Middleware::isValidVersion('1.2.3.4.5.a');
+        Slim4Checker::isValidVersion('1.2.3.4.5.a');
     }
 
     public function testValidVersionSixPieces()
     {
-        $this->assertTrue(Slim4Middleware::isValidVersion('1.2.3.4.5.6'));
+        $this->assertTrue(Slim4Checker::isValidVersion('1.2.3.4.5.6'));
     }
 
     public function testGetComponentsSix()
     {
         $this->assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(
             ['major' => 1, 'minor' => 2, 'patch' => 3, 'build' => 4, 'unmapped-0' => 5, 'unmapped-1' => 6],
-            Slim4Middleware::getVersionComponents('1.2.3.4.5.6'),
+            Slim4Checker::getVersionComponents('1.2.3.4.5.6'),
             ['major', 'minor', 'patch', 'build', 'unmapped-0', 'unmapped-1']
         );
     }
 
     public function testIsVersionAtLeastViaReflection()
     {
-        $reflectionClass = new \ReflectionClass(Slim4Middleware::class);
+        $reflectionClass = new \ReflectionClass(Slim4Checker::class);
         $reflectionMethod = $reflectionClass->getMethod('isVersionAtLeast');
         /** @noinspection PhpExpressionResultUnusedInspection */
         $reflectionMethod->setAccessible(true);

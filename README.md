@@ -21,12 +21,15 @@ There are two methods of constructing the middleware:
 
 ```php
 use District5\MinimumVersion\Slim\Slim4Middleware;
+use District5\MinimumVersion\Slim\Slim4Checker;
 
 $app->add(
-    Slim4Middleware::fromValues(
-        '1.0.0', // Minimum version to accept
-        ['0.9.9', '1.0.0'], // Explicitly allowed versions
-        'X-Api-Version' // Header name to check version against, defaults to 'X-Version'
+    new Slim4Middleware(
+        Slim4Checker::fromValues(
+            '1.0.0', // Minimum version to accept
+            ['0.9.9', '1.0.0'], // Explicitly allowed versions
+            'X-Api-Version' // Header name to check version against, defaults to 'X-Version'
+        )
     )
 );
 ```
@@ -35,12 +38,15 @@ $app->add(
 
 ```php
 use District5\MinimumVersion\Slim\Slim4Middleware;
+use District5\MinimumVersion\Slim\Slim4Checker;
 
 $app->add(
-    Slim4Middleware::fromEnv(
-        'MINIMUM_VERSION', // Environment variable name for minimum version, e.g. '1.0.0'
-        'ALLOWED_VERSIONS', // Environment variable name for allowed versions, comma-separated, e.g. '0.0.9, 1.0.0'
-        Slim4Middleware::VERSION_HEADER // This is the default value of 'X-Version'. The header name to check version
+    new Slim4Middleware(
+        Slim4Checker::fromEnv(
+            'MINIMUM_VERSION', // Environment variable name for minimum version, e.g. '1.0.0'
+            'ALLOWED_VERSIONS', // Environment variable name for allowed versions, comma-separated, e.g. '0.0.9, 1.0.0'
+            Slim4Middleware::VERSION_HEADER // This is the default value of 'X-Version'. The header name to check version
+        )
     )
 );
 ```
